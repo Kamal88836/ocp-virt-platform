@@ -1,0 +1,27 @@
+apiVersion: loki.grafana.com/v1
+kind: LokiStack
+metadata:
+  name: logging-loki
+  namespace: openshift-logging
+spec:
+  size: 1x.small                       # 1x.extra-small (non-prod) | 1x.small | 1x.medium – size to log volume
+  storage:
+    schemas:
+      - version: v13
+        effectiveDate: "2024-10-01"
+    secret:
+      name: logging-loki-s3
+      type: s3
+    tls:
+      caName: openshift-service-ca.crt   # NooBaa service CA; omit for public-CA external S3
+  storageClassName: ocs-storagecluster-ceph-rbd
+  tenants:
+    mode: openshift-logging
+  limits:
+    global:
+      retention:
+        days: 30
+      ingestion:
+        ingestionRate: 20
+        ingestionBurstSize: 30
+  managementState: Managed

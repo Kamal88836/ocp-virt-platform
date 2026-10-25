@@ -1,0 +1,37 @@
+global:
+  resolve_timeout: 5m
+  smtp_smarthost: smtp.<domain>:25
+  smtp_from: openshift-alerts@<domain>
+  smtp_require_tls: false
+route:
+  receiver: default-email
+  group_by: [namespace, alertname]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  routes:
+    - matchers: [ 'alertname = Watchdog' ]
+      receiver: deadmans-switch
+      repeat_interval: 5m
+    - matchers: [ 'severity = critical' ]
+      receiver: pagerduty-platform
+      continue: true
+    - matchers: [ 'namespace =~ "openshift-cnv|openshift-mtv|openshift-workload-availability"' ]
+      receiver: virt-team-email
+    - matchers: [ 'namespace =~ "openshift-storage|openshift-logging|netobserv"' ]
+      receiver: platform-team-email
+inhibit_rules:
+  - source_matchers: [ 'severity = critical' ]
+    target_matchers: [ 'severity = warning' ]
+    equal: [namespace, alertname]
+receivers:
+  - name: default-email
+    email_configs: [ { to: ocp-platform@<domain> } ]
+  - name: platform-team-email
+    email_configs: [ { to: ocp-platform@<domain> } ]
+  - name: virt-team-email
+    email_configs: [ { to: ocp-virtualization@<domain> } ]
+  - name: pagerduty-platform
+    pagerduty_configs: [ { routing_key: '<PD_INTEGRATION_KEY>', severity: critical } ]
+  - name: deadmans-switch
+    webhook_configs: [ { url: 'https://<heartbeat-monitor>/ping/<id>' } ]   # external dead-man's switch

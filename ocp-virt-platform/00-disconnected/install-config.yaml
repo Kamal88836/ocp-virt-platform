@@ -1,0 +1,40 @@
+apiVersion: v1
+baseDomain: <domain>
+metadata:
+  name: <cluster>
+compute:
+  - name: worker
+    replicas: 3
+    architecture: amd64
+controlPlane:
+  name: master
+  replicas: 3
+  architecture: amd64
+networking:
+  networkType: OVNKubernetes
+  clusterNetwork:
+    - cidr: 10.128.0.0/14
+      hostPrefix: 23
+  serviceNetwork:
+    - 172.30.0.0/16
+  machineNetwork:
+    - cidr: 10.10.20.0/24
+platform:
+  baremetal:
+    apiVIPs: [10.10.20.5]
+    ingressVIPs: [10.10.20.6]
+fips: false
+pullSecret: '<contents of pull-secret-merged.json on one line>'
+sshKey: '<ssh-ed25519 AAAA... bastion key>'
+additionalTrustBundlePolicy: Always
+additionalTrustBundle: |
+  -----BEGIN CERTIFICATE-----
+  <client root CA that signed registry.<domain>>
+  -----END CERTIFICATE-----
+imageDigestSources:                       # copy from working-dir/cluster-resources/idms-oc-mirror.yaml
+  - mirrors:
+      - registry.<domain>:8443/openshift/release
+    source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+  - mirrors:
+      - registry.<domain>:8443/openshift/release-images
+    source: quay.io/openshift-release-dev/ocp-release

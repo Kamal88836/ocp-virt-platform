@@ -1,0 +1,11 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata: { name: virt-platform, namespace: openshift-gitops }
+spec:
+  project: default
+  source:
+    repoURL: https://<git-server>/<group>/ocp-virt-platform.git
+    targetRevision: main
+    path: 02-operators
+  destination: { server: https://kubernetes.default.svc }
+  syncPolicy: { automated: { prune: false, selfHeal: true } }

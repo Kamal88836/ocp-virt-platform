@@ -1,0 +1,24 @@
+apiVersion: forklift.konveyor.io/v1beta1
+kind: ForkliftController
+metadata:
+  name: forklift-controller
+  namespace: openshift-mtv
+spec:
+  olm_managed: true
+  feature_ui_plugin: 'true'
+  feature_validation: 'true'
+  feature_volume_populator: 'true'
+  feature_copy_offload: 'false'            # set 'true' only with a supported array (NetApp, Pure, HPE, Dell)
+  controller_max_vm_inflight: '20'         # concurrent disk transfers across all plans (default 20)
+  controller_precopy_interval: '60'        # minutes between warm-migration precopies
+  controller_snapshot_removal_check_retries: '20'
+  controller_cleanup_retries: '10'
+  controller_filesystem_overhead: '10'     # % overhead when target volumeMode is Filesystem
+  controller_block_overhead: '0'
+  controller_container_requests_cpu: '500m'
+  controller_container_requests_memory: '800Mi'
+  controller_container_limits_memory: '2Gi'
+  inventory_container_requests_memory: '1Gi'
+  inventory_container_limits_memory: '4Gi'
+  virt_v2v_container_requests_memory: '2Gi'
+  virt_v2v_container_limits_memory: '8Gi'
