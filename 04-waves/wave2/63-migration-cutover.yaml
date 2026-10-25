@@ -1,0 +1,10 @@
+apiVersion: forklift.konveyor.io/v1beta1
+kind: Migration
+metadata:
+  generateName: wave2-warm-
+  namespace: openshift-mtv
+spec:
+  plan:
+    name: wave2-warm
+    namespace: openshift-mtv
+  cutover: "2026-11-01T22:00:00Z"   # UTC; patch spec.cutover to move it
